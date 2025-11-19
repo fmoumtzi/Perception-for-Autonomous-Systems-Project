@@ -1,19 +1,32 @@
-# Python
+# Your excluded folder
+data/
+
+# Python cache and compiled files
 __pycache__/
 *.py[cod]
 *.pyo
 *.pyd
 *.sqlite3
 
-# Virtual envs
+# Virtual environments
 venv/
-.env/
-.env.*/
 .venv/
+.env/
+.env*/
 
-# PyCharm
+# PyCharm project files
 .idea/
 
 # macOS
 .DS_Store
 
+# Logs
+*.log
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Distribution / packaging
+build/
+dist/
+*.egg-info/
