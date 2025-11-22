@@ -25,7 +25,7 @@ MIN_HITS = 1
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument("--model", type=str, default="yolov8m.pt", help="YOLO model to use (default: yolov8n.pt)")
+    parser.add_argument("--model", type=str, default="yolov8s.pt", help="YOLO model to use (default: yolov8s.pt)")
     args = parser.parse_args()
 
     print(f"Loading model: {args.model}...")
