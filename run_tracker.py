@@ -16,7 +16,7 @@ from tracking.utils import (
 )
 
 IMAGE_FOLDER = "output/seq3_rectified"
-OCCLUSION_TEMPLATE = "occlusion.png"
+OCCLUSION_TEMPLATE = "tracking/occlusion.png"
 VALID_CLASSES = [0, 1, 2, 3, 5, 7] 
 CONF_THRESHOLD = 0.5
 TRACKER_MAX_AGE = 30 
@@ -25,7 +25,7 @@ MIN_HITS = 1
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument("--model", type=str, default="yolov8s.pt", help="YOLO model to use (default: yolov8s.pt)")
+    parser.add_argument("--model", type=str, default="Detection_models/yolov8s.pt", help="YOLO model to use (default: yolov8s.pt)")
     args = parser.parse_args()
 
     print(f"Loading model: {args.model}...")
@@ -53,7 +53,7 @@ def main():
         if prev_frame is not None:
             # Threshold 0.99 is needed because the correlation only drops to ~0.985
             if detect_scene_change(prev_frame, frame, threshold=0.99):
-                print(f"\n[SCENE CHANGE DETECTED] Resetting Tracker at frame {frame_count}")
+                print(f"\n[SCENE CHANGE DETECTED] Resetting Tracker")
                 tracker = OcclusionSort(max_age=TRACKER_MAX_AGE, min_hits=MIN_HITS, iou_threshold=IOU_THRESHOLD)
                 last_occ_rect = None
         

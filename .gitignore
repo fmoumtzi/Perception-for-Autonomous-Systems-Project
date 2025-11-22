@@ -1,5 +1,6 @@
-# Your excluded folder
+# excluded folders
 data/
+output/
 
 # Python cache and compiled files
 __pycache__/
@@ -23,8 +24,6 @@ venv/
 # Logs
 *.log
 
-# Jupyter
-.ipynb_checkpoints/
 
 # Distribution / packaging
 build/
