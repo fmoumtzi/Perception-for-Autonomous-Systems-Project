@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 
 USER_PARAMS_FILE = "../output/stereo_params.npz"
 
-RAW_IMG_PATH = "../data/raw_seq1/image_02/data/0000000000.png"
+RAW_IMG_PATH = "data/calib_data/image_02/data/0000000000.png"
 GT_RECT_PATH = "../output/seq1_rectified/rect_left_0000.png"
 
 

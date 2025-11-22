@@ -8,11 +8,11 @@ CALIB_FILE = "config/calib_cam_to_cam.txt"
 LEFT_CAM_ID = "02"
 RIGHT_CAM_ID = "03"
 
-LEFT_DIR = "data/raw_seq1/image_02/data"
-RIGHT_DIR = "data/raw_seq1/image_03/data"
+LEFT_DIR = "data/raw_seq2/image_02/data"
+RIGHT_DIR = "data/raw_seq2/image_03/data"
 IMAGE_PATTERN = "*.png"
 
-OUT_DIR = "output/seq1_rectified"
+OUT_DIR = "output/seq2_rectified"
 
 # Disparity settings
 NUM_DISPARITIES = 128
@@ -145,20 +145,6 @@ def compute_disparity(rect_left, rect_right, num_disp, block_size):
     return disp_raw
 
 
-def visualize_disparity(disp):
-    d = disp.copy()
-    if np.all(~np.isfinite(d)):
-        return np.zeros((disp.shape[0], disp.shape[1], 3), dtype=np.uint8)
-
-    valid = np.isfinite(d)
-    v = d[valid]
-    dmin, dmax = np.percentile(v, [1, 99])
-    d = np.clip((d - dmin) / max(1e-6, (dmax - dmin)), 0, 1)
-    disp_gray = (d * 255).astype(np.uint8)
-    disp_color = cv2.applyColorMap(disp_gray, cv2.COLORMAP_JET)
-    return disp_color
-
-
 def collect_raw_pairs(left_dir, right_dir, pattern):
     left_dir = Path(left_dir)
     right_dir = Path(right_dir)
@@ -223,9 +209,7 @@ def main():
         rectL_vis = draw_epipolar_lines(rectL)
         rectR_vis = draw_epipolar_lines(rectR)
 
-        # 3. Compute Disparity on FULL images
         disp = compute_disparity(rectL, rectR, NUM_DISPARITIES, BLOCK_SIZE)
-        disp_vis = visualize_disparity(disp)
 
         depth = f * B / disp
 
@@ -234,14 +218,12 @@ def main():
         outR = Path(OUT_DIR) / f"rect_right_{i:04d}.png"
         outL_epi = Path(OUT_DIR) / f"epipolar_left{i:04d}.png"
         outR_epi = Path(OUT_DIR) / f"epipolar_right{i:04d}.png"
-        outD = Path(OUT_DIR) / f"disp_{i:04d}.png"
         outDepth  = Path(OUT_DIR) / f"depth_{i:04d}.npy"
 
         cv2.imwrite(str(outL), rectL)
         cv2.imwrite(str(outR), rectR)
         cv2.imwrite(str(outL_epi), rectL_vis)
         cv2.imwrite(str(outR_epi), rectR_vis)
-        cv2.imwrite(str(outD), disp_vis)
 
         # save deptt
         np.save(str(outDepth), depth)
