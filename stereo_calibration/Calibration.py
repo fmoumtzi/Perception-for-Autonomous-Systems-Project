@@ -12,7 +12,7 @@ OUT_FILE = "output/stereo_params.npz"
 
 # List of possible board sizes to look for (cols, rows)
 POSSIBLE_CHESSBOARD_SIZES = [(5, 7), (7, 11), (6, 10), (5, 15)]
-
+# Found through trial and error
 SQUARE_SIZE: float = 0.0995
 
 
@@ -46,7 +46,7 @@ def collect_image_pairs(calib_dir, left_pattern, right_pattern):
     right_files = sorted(calib_dir.glob(right_pattern))
 
     if len(left_files) == 0:
-        print(f"[WARN] No images found in {calib_dir / left_pattern}")
+        print(f"No images found in {calib_dir / left_pattern}")
         return []
 
     # Ensure we match valid pairs even if counts differ
@@ -77,7 +77,7 @@ def detect_corners(img_gray):
         ret, corners = cv2.findChessboardCorners(img_processed, size, None)
 
         if ret:
-            # Refine on the original gray image for better accuracy
+            # Refining the original gray image for better accuracy
             criteria = (cv2.TERM_CRITERIA_EPS + cv2.TERM_CRITERIA_MAX_ITER, 30, 1e-4)
             corners_refined = cv2.cornerSubPix(img_gray, corners, (11, 11), (-1, -1), criteria)
             return True, corners_refined, size

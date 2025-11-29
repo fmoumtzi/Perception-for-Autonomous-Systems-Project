@@ -35,7 +35,7 @@ def associate_detections_to_trackers(detections, trackers, iou_threshold=0.3):
         matches = np.concatenate(matches, axis=0)
     return matches, np.array(unmatched_detections), np.array(unmatched_trackers)
 
-class OcclusionSort(object):
+class Sort(object):
     def __init__(self, max_age=30, min_hits=3, iou_threshold=0.3):
         self.max_age = max_age
         self.min_hits = min_hits
@@ -46,7 +46,7 @@ class OcclusionSort(object):
     def update(self, dets=np.empty((0, 6)), occlusion_rect=None):
         self.frame_count += 1
         
-        # 1. Prediction
+        # Prediction
         trks = np.zeros((len(self.trackers), 5))
         to_del = []
         ret = []
@@ -59,10 +59,10 @@ class OcclusionSort(object):
         for t in reversed(to_del):
             self.trackers.pop(t)
             
-        # 2. Matching
+        # Matching
         matched, unmatched_dets, unmatched_trks = associate_detections_to_trackers(dets, trks, self.iou_threshold)
 
-        # 3. Update matched
+        # Update matched
         for m in matched:
             det = dets[m[0], :5] # Take first 5 elements (x1,y1,x2,y2,conf)
             trk = self.trackers[m[1]]
@@ -93,30 +93,33 @@ class OcclusionSort(object):
                     is_occluded = True
             
             if is_occluded:
-                # User logic: If occluded, DO NOT update KF state, but keep alive
+               # If occluded, DO NOT update KF state, but keep alive
                 trk.hit()
             else:
                 # Standard update
                 trk.update(det)
 
-        # 4. Create new tracks
+        # Create new tracks
         for i in unmatched_dets:
             det = dets[i, :]
             class_id = int(det[5]) if len(det) > 5 else None
             trk = KalmanBoxTracker(det[:4], class_id)
             self.trackers.append(trk)
             
-        # 5. Output gathering
+        # Output gathering
         i = len(self.trackers)
         for trk in reversed(self.trackers):
             d = trk.get_state()[0]
             
-            # Logic: Keep alive if young enough AND seen at least once
+            # Keep alive if young enough AND seen at least once
             has_been_seen_enough = (trk.hits >= self.min_hits) or (self.frame_count <= self.min_hits)
             is_active = (trk.time_since_update <= self.max_age)
             
             if is_active and has_been_seen_enough:
-                ret.append(np.concatenate((d, [trk.id + 1])).reshape(1, -1))
+                # Return [x1, y1, x2, y2, track_id, class_id]
+                # Use -1 if class_id is None
+                cls_id = trk.class_id if trk.class_id is not None else -1
+                ret.append(np.concatenate((d, [trk.id + 1], [cls_id])).reshape(1, -1))
 
             i -= 1
             if trk.time_since_update > self.max_age:
@@ -124,4 +127,4 @@ class OcclusionSort(object):
                 
         if len(ret) > 0:
             return np.concatenate(ret)
-        return np.empty((0, 5))
+        return np.empty((0, 6))

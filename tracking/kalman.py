@@ -45,7 +45,7 @@ def predict_kalman(kalman, class_id=None):
     # Predict state x
     x = np.dot(F, x) + u
 
-    # Hardcoded increase in velocity (USER REQUEST)
+    # Hardcoded increase in velocity
     # Class-specific tuning:
     # 0: Person -> 1.02
     # 1: Bicycle (Cyclist) -> 1.05

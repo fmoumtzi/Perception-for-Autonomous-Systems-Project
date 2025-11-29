@@ -4,10 +4,16 @@ import matplotlib
 matplotlib.use('TkAgg')
 import matplotlib.pyplot as plt
 
-USER_PARAMS_FILE = "../output/stereo_params.npz"
+"""
+This script compares our stereo rectification results against a ground truth (GT) rectified image.
+It loads a raw image and a corresponding GT rectified image, applies our rectification using
+pre-computed stereo parameters, and displays both side-by-side for visual comparison.
+"""
 
-RAW_IMG_PATH = "data/calib_data/image_02/data/0000000000.png"
-GT_RECT_PATH = "../output/seq1_rectified/rect_left_0000.png"
+USER_PARAMS_FILE = "./output/stereo_params.npz"
+
+RAW_IMG_PATH = "./data/calib_data/image_02/data/0000000000.png"
+GT_RECT_PATH = "./output/seq3_rectified/rect_left_0000.png"
 
 
 def rectification(user_params_file, raw_img):

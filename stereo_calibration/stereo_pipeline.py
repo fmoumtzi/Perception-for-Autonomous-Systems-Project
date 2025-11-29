@@ -8,18 +8,18 @@ CALIB_FILE = "config/calib_cam_to_cam.txt"
 LEFT_CAM_ID = "02"
 RIGHT_CAM_ID = "03"
 
-LEFT_DIR = "data/raw_seq2/image_02/data"
-RIGHT_DIR = "data/raw_seq2/image_03/data"
+LEFT_DIR = "data/raw_seq3/image_02/data"
+RIGHT_DIR = "data/raw_seq3/image_03/data"
 IMAGE_PATTERN = "*.png"
 
-OUT_DIR = "output/seq2_rectified"
+OUT_DIR = "output/seq3_rectified"
 
 # Disparity settings
 NUM_DISPARITIES = 128
 BLOCK_SIZE = 9
 
 
-def load_kitti_calib_cam_to_cam(path):
+def load_calib_cam_to_cam(path):
     """
     Parse calib_cam_to_cam.txt file into a dict of np.arrays.
     """
@@ -175,14 +175,14 @@ def get_fb_from_P(camL, camR):
     P_R = camR["P_rect"]
 
     f = P_L[0, 0]
-    # KITTI-style: P_R[0,3] = -f * B
+    # P_R[0,3] = -f * B
     B = -P_R[0, 3] / f
     return f, B
 
 
 def main():
     os.makedirs(OUT_DIR, exist_ok=True)
-    calib_data = load_kitti_calib_cam_to_cam(CALIB_FILE)
+    calib_data = load_calib_cam_to_cam(CALIB_FILE)
 
     camL = get_camera_params(calib_data, LEFT_CAM_ID)
     camR = get_camera_params(calib_data, RIGHT_CAM_ID)
@@ -225,7 +225,7 @@ def main():
         cv2.imwrite(str(outL_epi), rectL_vis)
         cv2.imwrite(str(outR_epi), rectR_vis)
 
-        # save deptt
+        # save depth
         np.save(str(outDepth), depth)
         if i % 10 == 0:
             print(f"Processed {i}/{len(pairs)} pairs...")
