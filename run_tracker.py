@@ -15,7 +15,7 @@ from tracking.utils import (
     is_overlapping
 )
 
-IMAGE_FOLDER = "output/seq3_rectified"
+IMAGE_FOLDER = "output/seq2_rectified"
 OCCLUSION_TEMPLATE = "tracking/occlusion.png"
 VALID_CLASSES = [0, 1, 2, 3, 5, 7] 
 CONF_THRESHOLD = 0.5
@@ -35,13 +35,17 @@ CLASS_COLORS = {
 DEFAULT_COLOR = (255, 255, 255) # White for others
 
 def main():
+    """
+    Main function to run object detection and tracking on a sequence of images.
+    """
     parser = argparse.ArgumentParser()
-    parser.add_argument("--model", type=str, default="Detection_models/yolov8s.pt", help="YOLO model to use (default: yolov8s.pt)")
-    parser.add_argument("--output_video", type=str, default="output/video/scene3.mp4", help="Path to save the output video (e.g., output.mp4)")
+    parser.add_argument("--model", type=str, default="Detection_models/best.pt", help="YOLO model to use (default: yolov8s.pt)")
+    parser.add_argument("--output_video", type=str, default="output/video/scene2.mp4", help="Path to save the output video (e.g., output.mp4)")
     args = parser.parse_args()
 
     print(f"Loading model: {args.model}...")
     model = YOLO(args.model)
+    # Initialize SORT tracker
     tracker = Sort(max_age=TRACKER_MAX_AGE, min_hits=MIN_HITS, iou_threshold=IOU_THRESHOLD)
     
     occ_img = cv2.imread(OCCLUSION_TEMPLATE)
@@ -61,6 +65,7 @@ def main():
         frame = cv2.imread(str(img_path))
         if frame is None: continue
         
+        # Initialize video writer if needed
         if args.output_video and video_writer is None:
             height, width = frame.shape[:2]
             fourcc = cv2.VideoWriter_fourcc(*'mp4v')
@@ -78,6 +83,7 @@ def main():
         
         prev_frame = frame.copy()
     
+        # Detect occlusion
         occ_rect = find_occlusion_rect(frame, occ_img, last_occ_rect)
         last_occ_rect = occ_rect
         
@@ -85,6 +91,7 @@ def main():
             cv2.rectangle(frame, (occ_rect[0], occ_rect[1]), (occ_rect[2], occ_rect[3]), (50, 50, 50), 2)
 
         if True:
+            # Run YOLO detection
             results = model(frame, classes=VALID_CLASSES, conf=CONF_THRESHOLD, verbose=False)[0]
             detections = []
             for box in results.boxes:
@@ -96,8 +103,10 @@ def main():
         else:
             detections = np.empty((0, 6))
 
+        # Update tracker
         tracks = tracker.update(detections, occ_rect)
 
+        # Visualize tracking results
         if True:
             for track in tracks:
                 tx1, ty1, tx2, ty2, track_id, class_id = map(int, track)

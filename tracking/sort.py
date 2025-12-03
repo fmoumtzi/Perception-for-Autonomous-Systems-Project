@@ -3,14 +3,19 @@ from tracking.kalman import KalmanBoxTracker
 from tracking.utils import iou_batch, linear_assignment
 
 def associate_detections_to_trackers(detections, trackers, iou_threshold=0.3):
+    """
+    Matches detections to existing trackers using IOU.
+    """
     if len(trackers) == 0:
         return np.empty((0, 2), dtype=int), np.arange(len(detections)), np.empty((0, 5), dtype=int)
+    # Compute IOU matrix
     iou_matrix = iou_batch(detections, trackers)
     if min(iou_matrix.shape) > 0:
         a = (iou_matrix > iou_threshold).astype(np.int32)
         if a.sum(1).max() == 1 and a.sum(0).max() == 1:
             matched_indices = np.stack(np.where(a), axis=1)
         else:
+            # Hungarian algorithm
             matched_indices = linear_assignment(-iou_matrix)
     else:
         matched_indices = np.empty(shape=(0, 2))
@@ -36,6 +41,9 @@ def associate_detections_to_trackers(detections, trackers, iou_threshold=0.3):
     return matches, np.array(unmatched_detections), np.array(unmatched_trackers)
 
 class Sort(object):
+    """
+    Simple Online and Realtime Tracking (SORT) implementation.
+    """
     def __init__(self, max_age=30, min_hits=3, iou_threshold=0.3):
         self.max_age = max_age
         self.min_hits = min_hits
@@ -44,6 +52,9 @@ class Sort(object):
         self.frame_count = 0
 
     def update(self, dets=np.empty((0, 6)), occlusion_rect=None):
+        """
+        Updates trackers with new detections and returns tracked objects.
+        """
         self.frame_count += 1
         
         # Prediction
@@ -51,6 +62,7 @@ class Sort(object):
         to_del = []
         ret = []
         for t, trk in enumerate(trks):
+            # Predict next state
             pos = self.trackers[t].predict()[0]
             trk[:] = [pos[0], pos[1], pos[2], pos[3], 0]
             if np.any(np.isnan(pos)):

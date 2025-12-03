@@ -8,11 +8,11 @@ CALIB_FILE = "config/calib_cam_to_cam.txt"
 LEFT_CAM_ID = "02"
 RIGHT_CAM_ID = "03"
 
-LEFT_DIR = "data/raw_seq3/image_02/data"
-RIGHT_DIR = "data/raw_seq3/image_03/data"
+LEFT_DIR = "data/raw_seq1/image_02/data"
+RIGHT_DIR = "data/raw_seq1/image_03/data"
 IMAGE_PATTERN = "*.png"
 
-OUT_DIR = "output/seq3_rectified"
+OUT_DIR = "output/seq1_rectified"
 
 # Disparity settings
 NUM_DISPARITIES = 128

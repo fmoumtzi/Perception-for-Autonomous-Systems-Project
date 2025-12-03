@@ -45,17 +45,16 @@ def predict_kalman(kalman, class_id=None):
     # Predict state x
     x = np.dot(F, x) + u
 
-    # Hardcoded increase in velocity
     # Class-specific tuning:
     # 0: Person -> 1.02
     # 1: Bicycle (Cyclist) -> 1.05
     # 2, 3, 5, 7: Vehicles -> 1.12 (Faster acceleration)
-    multiplier = 1.02
+    multiplier = 1.05
     if class_id is not None:
         if class_id == 1: # Bicycle
-            multiplier = 1.05
-        elif class_id in [2, 3, 5, 7]: # Car, Motorcycle, Bus, Truck
-            multiplier = 1.12
+            multiplier = 1.02
+        elif class_id in [0]: # Car, Motorcycle, Bus, Truck
+            multiplier = 1.10
         
     x[1] = x[1] * multiplier
     x[3] = x[3] * multiplier
