@@ -40,7 +40,7 @@ def main():
     """
     parser = argparse.ArgumentParser()
     parser.add_argument("--model", type=str, default="Detection_models/best.pt", help="YOLO model to use (default: yolov8s.pt)")
-    parser.add_argument("--output_video", type=str, default="output/video/scene2.mp4", help="Path to save the output video (e.g., output.mp4)")
+    parser.add_argument("--output_video", type=str, default="videos/scene2.mp4", help="Path to save the output video (e.g., output.mp4)")
     args = parser.parse_args()
 
     print(f"Loading model: {args.model}...")
